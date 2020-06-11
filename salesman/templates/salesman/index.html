@@ -1,0 +1,47 @@
+{% extends "salesman/base.html" %}
+
+{% block style %}
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+{% endblock style %}
+
+{% block title %}COMPUTEX{% endblock title%}
+
+{% block content %}
+<div class="article-title">
+{% if user.is_authenticated %}
+<h3>Your problems</h3>
+  {% for File in Files %}
+    <article class = "media content-section">
+      <div class = "media-body">
+        <div class = "article-title">
+          <h3>{{ File.file_name }}</h3>
+          <small class="text-muted">{{ File.date_uploaded|date:"F d, Y" }} </small>
+        </div>
+          <p class="article-content">
+            {% with File.print_result as p %}
+              {{ p }}
+            {% endwith %}
+          </p>
+        </div>
+    </article>
+      {% endfor %}
+  {% else %}
+<h3>Welcome to travelling salesman problem solver</h3>
+  <h6>Login or register to start new problem</h6>
+  {% endif %}
+</div>
+
+
+
+{% endblock content %}
