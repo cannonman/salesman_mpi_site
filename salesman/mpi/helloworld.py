@@ -1,4 +1,4 @@
-import mpi4py as MPI
+from mpi4py import MPI
 
 size = MPI.COMM_WORLD.Get_size()  # number of processes
 rank = MPI.COMM_WORLD.Get_rank()  # id of process

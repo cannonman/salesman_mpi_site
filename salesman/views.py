@@ -7,6 +7,11 @@ from django.shortcuts import redirect
 from salesman.models import Files
 from django.views.generic.list import ListView
 import datetime
+from background_task import background
+from subprocess import PIPE, STDOUT, Popen
+import subprocess
+
+path = ""
 
 
 def index(request):
@@ -49,26 +54,40 @@ def test(request):
     return render(request, 'salesman/templatetest.html')
 
 
-def handle_uploaded_file(f, name):
-    with open('parallelsite/media/' + name + '.txt', 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
-
 def new_file(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
+
             f = form.save(commit=False)
             f.user = request.user
             f.date_uploaded = datetime.datetime.now()
             f.save()
+            current_id = f.id
+            print(current_id)
+
+            file = Files.objects.get(id=current_id).get_dir()
+
+            background(file, current_id)
+
+            #subprocess.run(["python","manage.py","process_tasks"])
+
             return redirect('index')
     else:
         print("nie")
         form = UploadFileForm()
 
     return render(request, 'salesman/new.html', {'form': form})
+
+
+@background(schedule=1)
+def background(file, curr_id):
+    print("start f")
+    p = Popen("python salesman/simulation.py " + file, stdout=PIPE, stderr=STDOUT, shell=True)
+    line = p.stdout.readline().decode('utf-8')
+    print(line[:-2])
+    Files.objects.filter(id=curr_id).update(finished=True, result=line[:-2])
+
 
 
 class ComputeListView(ListView):

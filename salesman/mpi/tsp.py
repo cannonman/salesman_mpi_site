@@ -12,6 +12,9 @@ rank = comm.Get_rank()
 import os
 
 
+
+
+
 def wczytaj(file):
     data = []
     plik = open(file)

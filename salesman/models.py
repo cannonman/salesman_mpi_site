@@ -18,3 +18,6 @@ class Files(models.Model):
 
     # def __str__(self):
     #     return self.index + self.file_name
+
+    def get_dir(self):
+        return self.file.__str__()
